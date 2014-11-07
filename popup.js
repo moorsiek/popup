@@ -219,19 +219,40 @@
             top,
             css;
 
-        if (false && fixedSupported) {
+        var layoutWidth = $(document).width(),
+            layoutHeight = $(document).height(),
+            viewportWidth = $(window).width(),
+            viewportHeight = $(window).height(),
+            scrollLeft = $(window).scrollLeft(),
+            scrollTop = $(window).scrollTop();
+
+        var higherHeight = this._height > viewportHeight,
+            higherWidth = this._width > viewportWidth;
+
+        if (higherWidth || higherHeight || !fixedSupported) {
+            css = {
+                position: 'absolute',
+                margin: 0
+            };
+            if (higherWidth) {
+                css.left = scrollLeft + 'px';
+            } else {
+                css.left = Math.floor(viewportWidth / 2 - this._width / 2 + scrollLeft) + 'px';
+            }
+            if (higherHeight) {
+                css.top = scrollTop + 'px';
+            } else {
+                css.top = Math.floor(viewportHeight / 2 - this._height / 2 + scrollTop) + 'px';
+            }
+        } else {
             css = {
                 position: 'fixed',
                 left: '50%',
                 top: '50%',
                 margin: (-this._height / 2) + 'px 0 0 ' + (-this._width / 2) + 'px'
             };
-        } else {
-            css = {
-                left: (Math.floor($window.outerWidth(true) / 2 - this._width / 2 + $(window).scrollLeft())) + 'px',
-                top: (Math.floor($window.outerHeight(true) / 2 - this._height / 2 + $(window).scrollTop())) + 'px'
-            };
         }
+        
         this._$widget.css(css);
     };
     Popup.prototype._render = function() {
