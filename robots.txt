@@ -1,0 +1,26 @@
+User-agent: Yandex
+Disallow: /registration
+Disallow: /recovery
+Disallow: /login
+Disallow: /assets/
+Host: www.timeout.ru
+Sitemap: http://www.timeout.ru/sitemaps/sitemap_spb.xml
+Sitemap: http://www.timeout.ru/sitemaps/sitemap_msk.xml
+
+User-agent: Googlebot
+Disallow: /registration
+Disallow: /recovery
+Disallow: /login
+Disallow: /assets/
+Host: www.timeout.ru
+Sitemap: http://www.timeout.ru/sitemaps/sitemap_spb.xml
+Sitemap: http://www.timeout.ru/sitemaps/sitemap_msk.xml
+
+User-agent: *
+Disallow: /registration
+Disallow: /recovery
+Disallow: /login
+Disallow: /assets/
+Host: www.timeout.ru
+Sitemap: http://www.timeout.ru/sitemaps/sitemap_spb.xml
+Sitemap: http://www.timeout.ru/sitemaps/sitemap_msk.xml

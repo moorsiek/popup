@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Popup test</title>
+    <script src="jquery-1.9.1.min.js"></script>
+    <script src="pubsub.js"></script>
+    <script src="popup.js"></script>
+    <!--<script src="alert.js"></script>-->
+    <script src="alert2.js"></script>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            background: #eee;
+            font: 13px 'PT Sans', Arial, "Helvetica Neue", Helvetica, sans-serif;
+        }
+
+        .b-toru-popup {
+            margin: 0;
+            padding: 1px;
+            z-index: 102;
+
+            background: #fff;
+            border-radius: 2px 2px 0 0;
+            margin: 0;
+            /*width: 270px;*/
+            
+            position: relative;
+            
+            padding: 0 35px 25px;
+        }
+        .b-toru-popup__title {
+            display: block;
+            color: #404040;
+            line-height: 33px;
+            font-size: 30px;
+            padding: 22px 0 27px;
+            font-weight: 100;
+            text-align: center;
+        }
+        .b-toru-popup__close {
+            position: absolute;
+            display: block;
+            top: 14px;
+            right: 14px;
+            background: url("sprite.png") no-repeat -184px 0;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        .b-toru-popup__button {
+            cursor: pointer;
+            background: #f44545;
+            border: none;
+            -webkit-border-radius: 4px;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 13px;
+            line-height: 35px;
+            height: 35px;
+            text-align: center;
+            min-width: 210px;
+            padding: 0 20px;
+        }
+
+        body.mob {
+            width: 2000px;
+            height: 5000px;
+        }
+        body.mob #popups {
+            margin-left: 420px;
+            margin-top: 613px;
+        }
+    </style>
+</head>
+<body class="mob">
+
+<script type="text/html">
+    <div class="b-toru-popup">
+        <a class="b-toru-popup__close" href="#" title="Закрыть" data-popup-cmd="close"></a>
+        <% if (title != null) %>
+        <div class="b-toru-popup__title"><%= title %></div>
+        <% } %>
+        <div class="b-toru-popup__content"><%= content %></div>
+        <input class="b-toru-popup__button" type="submit" value="<%= okText %>">
+    </div>
+</script>
+
+<ul id="popups">
+    <li><a href="postreg">После регистрации</a></li>
+    <li><a href="sub">После подписки</a></li>
+    <li><a href="comment">Удаление комментария</a></li>
+    <li><a href="reg">Регистрация</a></li>
+    <li><a href="login">Авторизация</a></li>
+</ul>
+<script>
+    $('#popups')
+        .on('click', 'a', function(e){
+            e.preventDefault();
+                
+            var type = $(this).attr('href'),
+                $content = $('#popup-' + type);
+            new Popup($content, {
+                modal: true
+            }).open();
+        });
+    $('a[href=postreg]')
+        .click(function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var a = new Alert(
+                    'Поздравляем<br>с регистрацией на TimeOut',
+                    'Теперь вы можете начать в полной мере пользоваться нашим сайтом, для вас открыты новыми возможности!',
+                    'Начать пользоваться', {
+                        width: '450px'
+                    }
+            );
+//            new Alert('Длина пароля должна быть >= 8 символов', {
+//                escapeTitle: true,
+//                escapeContent: true
+//            });
+        });
+</script>
+
+<div style="display: none">
+    <div id="popup1" class="b-toru-popup">
+        <a class="b-toru-popup__close" href="#" title="Закрыть" data-popup-cmd="close"></a>
+        <div class="b-toru-popup__title">Bzzzz</div>
+        <p class="b-toru-popup__content">
+            <span>Fff</span> <span>Nnn</span>
+        </p>
+    </div>
+    
+    <div id="popup-postreg" class="b-toru-popup">
+        <a class="b-toru-popup__close" href="#" title="Закрыть" data-popup-cmd="close"></a>
+        <div class="b-toru-popup__title">Поздравляем с регистрацией на TimeOut</div>
+        <p class="b-toru-popup__content">Теперь вы можете начать в полной мере пользоваться нашим сайтом, для вас открыты новыми возможности!</p>
+    </div>
+    
+    <div id="popup-sub" class="b-toru-popup">
+        <a class="b-toru-popup__close" href="#" title="Закрыть" data-popup-cmd="close"></a>
+        <div class="b-toru-popup__title">Спасибо</div>
+        <p class="b-toru-popup__content">Спасибо, что подписались на нашу рассылку!</p>
+    </div>
+    
+    <div id="confirm-comment" class="b-toru-popup">
+        <a class="b-toru-popup__close" href="#" title="Закрыть" data-popup-cmd="close"></a>
+        <div class="b-toru-popup__title">Удаление комментария</div>
+        <p class="b-toru-popup__content">Вы действительно хотите удалить комментарий?</p>
+    </div>
+    
+    <div id="confirm-reg" class="b-toru-popup">
+        <a class="b-toru-popup__close" href="#" title="Закрыть" data-popup-cmd="close"></a>
+        <div class="b-toru-popup__title">Регистрация</div>
+        <p class="b-toru-popup__content">Вы действительно хотите удалить комментарий?</p>
+    </div>
+    
+    <div id="confirm-login" class="b-toru-popup">
+        <a class="b-toru-popup__close" href="#" title="Закрыть" data-popup-cmd="close"></a>
+        <div class="b-toru-popup__title">Авторизация</div>
+        <p class="b-toru-popup__content">Вы действительно хотите удалить комментарий?</p>
+    </div>
+</div>
+
+<!--<script src="test.js"></script>-->
+<!--<script src="tests/pubsub.js"></script>-->
+<!--<script src="tests/popup.js"></script>-->
+<script>
+//TEST
+
+throw "bz";
+
+alert = new Alert(
+    "Поздравляем с регистрацией на TimeOut",
+    "Теперь вы можете начать в полной мере пользоваться нашим сайтом, для вас открыты новыми возможности!"
+)
+    .sub('close', function(e){
+            
+    });
+    
+alert = new alert(
+    "Спасибо!",
+    "Спасибо, что подписались на нашу рассылку!"
+)
+    .sub('close', function(e){
+        
+    });
+
+confirm= new confirm(
+    "Удаление комментария",
+    "Вы действительно хотите удалить комментарий?",
+    {
+        hideClose: true
+    }
+)
+    .sub('yes', function(){
+
+    })
+    .sub('no', function(){
+            
+    });
+    
+reg = new Popup(
+    "Регистрация",
+    $('.reg-form')
+)
+    .sub('close', function(){
+            
+    });
+
+login = new Popup(
+    "Авторизация",
+    $('.reg-form')
+)
+    .sub('close', function(){
+
+    });
+
+</script>
+</body>
+</html>
