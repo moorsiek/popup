@@ -84,6 +84,22 @@
                 });
             });
     };
+    Popup.report = function(){
+        var rep = '';
+        rep += 'w.$width=' + $(window).width();
+        rep += "\n";
+        rep += 'w.innerWidth=' + window.innerWidth;
+        rep += "\n";
+        rep += 'd.clientWidth=' + document.documentElement.clientWidth;
+        rep += "\n";
+        rep += 'd.offsetWidth=' + document.documentElement.offsetWidth;
+        rep += "\n";
+        rep += 'd.body.clientWidth=' + document.body.clientWidth;
+        rep += "\n";
+        rep += 'd.$width=' + $(document).width();
+        rep += "\n";
+        alert(rep);
+    };
     Popup.prototype._setSize = function() {
         var width,
             height;

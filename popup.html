@@ -73,6 +73,16 @@
             margin-left: 420px;
             margin-top: 613px;
         }
+        
+        .widthTest {
+            background: red;
+            height: 50px;
+        }
+        .widthTest_100p {
+            background: blue;
+            height: 50px;
+            width: 100%;
+        }
     </style>
 </head>
 <body class="mob">
@@ -87,6 +97,13 @@
         <input class="b-toru-popup__button" type="submit" value="<%= okText %>">
     </div>
 </script>
+
+<div class="widthTest">
+.
+</div>
+<div class="widthTest_100p">
+.
+</div>
 
 <ul id="popups">
     <li><a href="postreg">После регистрации</a></li>
@@ -169,7 +186,7 @@
 <!--<script src="tests/popup.js"></script>-->
 <script>
 //TEST
-
+setTimeout(function(){Popup.report();}, 700);
 throw "bz";
 
 alert = new Alert(
