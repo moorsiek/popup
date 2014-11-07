@@ -221,8 +221,8 @@
 
         var layoutWidth = $(document).width(),
             layoutHeight = $(document).height(),
-            viewportWidth = $(window).width(),
-            viewportHeight = $(window).height(),
+            viewportWidth = window.innerWidth != null ? window.innerWidth : document.documentElement.offsetWidth,
+            viewportHeight = window.innerHeight != null ? window.innerHeight : document.documentElement.offsetHeight,
             scrollLeft = $(window).scrollLeft(),
             scrollTop = $(window).scrollTop();
 
