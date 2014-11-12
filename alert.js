@@ -28,7 +28,7 @@
                 ((title != null) ? '<div class="' + o.cssPrefix + '-popup__title">' + title + '</div>' : '') +
                 ((message != null) ? '<p class="' + o.cssPrefix + '-popup__content">' + message + '</p>' : '') +
                 '<div style="text-align: center;">' +
-                '<input class="' + o.cssPrefix + '-popup__button" type="submit" value="' + okText + '">' +
+                '<input class="' + o.cssPrefix + '-popup__button' + o.buttonModifier + '" type="submit" value="' + okText + '">' +
                 '</div>' +
                 '</div>';
         return $(html);
@@ -46,11 +46,12 @@
         }(delegatedMethods[i]);
     }
     
-    defaults = {
+    Alert.defaults = defaults = {
         namespace: 'popup',
         modal: true,
         autoOpen: true,
-        cssPrefix: 'b-toru'
+        cssPrefix: 'b-toru',
+        buttonModifier: ''
     };
 
     context.Alert = Alert;

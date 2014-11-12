@@ -5,14 +5,16 @@
         Overlay = context.Overlay,
         $ = context.$,
         fixedSupported = context.supportsPositionFixed,
-        globalInstanceId = 1;
-
-    var defaults,
-        $body,
-        $window,
-        overlay,
-        overlayClients = 0;
+        globalInstanceId = 1,
+        baseZindex = 99999,
+        instancesInUse = 0,
+        maxZindex = baseZindex,
+        defaults,
+        $body, //cached jquery-ed DOM body node
+        $window, //cached jquery-ed window object
+        overlay; //overlay instance, shared among all popup instances
     
+    //constants
     var KEYCODE_ESC = 27;
         
     function Popup($content, options) {
@@ -27,6 +29,10 @@
         this._$widget = null;
         this._opened = false;
         this._id = globalInstanceId++;
+        maxZindex += this._options.modal ? 2 : 1;
+        this._zIndex = maxZindex;
+
+        ++instancesInUse;
         
         var self = this;
         this
@@ -43,7 +49,7 @@
                 }
             });
         
-        $(document).bind('keydown.' + this._options.namespace + this._id, function(e) {
+        $(document).on('keydown.' + this._options.namespace + this._id, function(e) {
             if (e.keyCode == KEYCODE_ESC) {
                 e.preventDefault();
                 self.close();
@@ -56,9 +62,14 @@
         });
         
         this._bindCmds();
-        
         this._render();
     }
+    Popup.setBaseZindex = function(zIndex) {
+        baseZindex = zIndex;
+        if (instancesInUse === 0) {
+            maxZindex = baseZindex;
+        }
+    };
     Popup.prototype._bindCmds = function() {
         var self = this;
         
@@ -98,8 +109,9 @@
         this._height = Math.floor(this._$widget.height());
         
         this._$widget.css({
-            width: width + 'px',
-            height: height + 'px'
+            width: this._width + 'px'
+            //TODO: research if we really need setting particular height
+            //height: this._height + 'px'
         });
     };
     Popup.prototype.open = function() {
@@ -114,9 +126,13 @@
         this.center();
         if (this._options.modal) {
             if (!overlay) overlay = new Overlay();
+            //TODO: remove after testing
+            window.overlay = overlay;
             
-            this._showOverlay(); //overlay.show();
+            this._showOverlay();
             
+            //TODO: probably, replace per-instance overlay.on with one shared handler
+            //TODO: remove dependency on private _$overlay field!
             overlay._$overlay.on('click.' + this._options.namespace + this._id, function(e){
                 e.preventDefault();
                 self.close();
@@ -126,18 +142,21 @@
         this._opened = true;
     };
     Popup.prototype._showOverlay = function() {
-        overlay.show(this._options.namespace + this._id);
+        overlay.show(this._options.namespace + this._id, this._zIndex - 1);
     };
     Popup.prototype._hideOverlay = function() {
-        overlay.show(this._options.namespace + this._id);
+        overlay.hide(this._options.namespace + this._id);
     };
     Popup.prototype.close = function() {
         if (!this._opened) {
             return;
         }
+
+        //TODO: remove dependency on private _$overlay field!
+        overlay._$overlay.off('click.' + this._options.namespace + this._id);
         
         if (this._options.modal) {
-            this._hideOverlay(); //overlay.hide();
+            this._hideOverlay();
         }
         this.pub('close');
         this._$widget.hide();
@@ -159,6 +178,12 @@
         delete this._$content;
         delete this._$widget;
         delete this._options;
+
+        if (--instancesInUse === 0) {
+            maxZindex = baseZindex;
+        } else if (this._zIndex === maxZindex) {
+            --maxZindex;
+        }
     };
     Popup.prototype.center = function() {
         var $window = $(window),
@@ -166,9 +191,7 @@
             top,
             css;
 
-        var layoutWidth = viewport.getLayoutWidth(),
-            layoutHeight = viewport.getLayoutHeight(),
-            viewportWidth = viewport.getVisualWidth(),
+        var viewportWidth = viewport.getVisualWidth(),
             viewportHeight = viewport.getVisualHeight(),
             scrollLeft = $(window).scrollLeft(),
             scrollTop = $(window).scrollTop();
@@ -206,7 +229,7 @@
         var o = this._options,
             self = this;
         
-        this._$widget = $('<div style="position: absolute; display: block; z-index: 100000;"/>')
+        this._$widget = $('<div style="position: absolute; display: block; z-index: ' + this._zIndex + ';"/>')
             .addClass('popup')
             .append(this._$content)
             .on('close.' + this._options.namespace + this._id, function(e){
@@ -222,8 +245,10 @@
         this._setSize();
         this._$widget.hide();
     };
-
-    defaults = {
+    Popup.prototype.getNode = function() {
+        return this._$widget;
+    };
+    Popup.defaults = defaults = {
         namespace: 'popup'
     };
 

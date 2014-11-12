@@ -5,6 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Popup test</title>
     <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+
+    <script src="posfxdsupp.js"></script>
     <script src="pubsub.js"></script>
     <script src="viewport.js"></script>
     <script src="overlay.js"></script>
@@ -67,6 +69,72 @@
             padding: 0 20px;
         }
 
+
+
+
+        .b-bz-popup {
+            margin: 0;
+            padding: 1px;
+            z-index: 102;
+
+            background: #fff;
+            border-radius: 2px 2px 0 0;
+            margin: 0;
+            /*width: 270px;*/
+
+            position: relative;
+
+            padding: 0 35px 25px;
+            border: 1px solid #fff;
+        }
+        .b-bz-popup__title {
+            display: block;
+            color: #404040;
+            line-height: 33px;
+            font-size: 30px;
+            /*padding: 22px 0 27px;*/
+            margin: 22px 0 27px;
+            font-weight: 100;
+            text-align: center;
+        }
+        .b-bz-popup__close {
+            position: absolute;
+            display: block;
+            top: 14px;
+            right: 14px;
+            background: url("sprite.png") no-repeat -184px 0;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        .b-bz-popup__button {
+            cursor: pointer;
+            background: #f44545;
+            border: none;
+            -webkit-border-radius: 4px;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 13px;
+            line-height: 35px;
+            height: 35px;
+            text-align: center;
+            min-width: 210px;
+            padding: 0 20px;
+        }
+        .b-bz-popup__button_neutral {
+            background: #888;
+        }
+        .b-bz-popup__button_good {
+            background: #2EC39F;
+        }
+        .b-bz-popup__button_evil {
+            background: #f44545;
+        }
+        
+        
+        
+        
+
         body.mob {
             width: 2000px;
             height: 5000px;
@@ -120,20 +188,29 @@
             e.preventDefault();
                 
             var type = $(this).attr('href'),
-                $content = $('#popup-' + type);
-            new Popup($content, {
-                modal: true
-            }).open();
+                $content = $('#popup-' + type),
+                popup = $(this).data('popup');
+            
+            if (!popup) {
+                popup = new Popup($content, {
+                    modal: true
+                });
+                $(this).data('popup');
+                window.p = popup;
+            }
+            popup.open();
         });
     $('a[href=postreg]')
         .click(function(e){
             e.preventDefault();
             e.stopPropagation();
-            var a = new Alert(
+            window.a = new Alert(
                     'Поздравляем<br>с регистрацией на TimeOut',
                     'Теперь вы можете начать в полной мере пользоваться нашим сайтом, для вас открыты новыми возможности!',
                     'Начать пользоваться', {
-                        width: '450px'
+                        width: '450px',
+                        cssPrefix: 'b-bz',
+                        buttonModifier: '_neutral'
                     }
             );
 //            new Alert('Длина пароля должна быть >= 8 символов', {
@@ -144,7 +221,7 @@
 </script>
 
 <div style="display: none">
-    <div id="popup1" class="b-toru-popup">
+    <div class="b-toru-popup">
         <a class="b-toru-popup__close" href="#" title="Закрыть" data-popup-cmd="close"></a>
         <div class="b-toru-popup__title">Bzzzz</div>
         <p class="b-toru-popup__content">
@@ -188,7 +265,7 @@
 <!--<script src="tests/popup.js"></script>-->
 <script>
 //TEST
-setTimeout(function(){Popup.report();}, 700);
+//setTimeout(function(){Popup.report();}, 700);
 throw "bz";
 
 alert = new Alert(
@@ -236,7 +313,8 @@ login = new Popup(
     .sub('close', function(){
 
     });
-
+    
 </script>
+<script>alert(devicePixelRatio);</script>
 </body>
 </html>

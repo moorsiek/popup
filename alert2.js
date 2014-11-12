@@ -2,8 +2,7 @@
     //END OF PROLOG
 
     var Popup = context.Popup,
-        $ = context.$,
-        tmpl = context.tmpl;
+        $ = context.$;
 
     var defaults;
     
@@ -30,22 +29,31 @@
     
     Alert.prototype._createContent = function(title, message, okText) {
         var o = this._options,
-            html = '<div class="' + o.cssPrefix + '-popup">' +
-                '<a class="' + o.cssPrefix + '-popup__close" href="#" title="Закрыть" data-' + o.namespace + '-cmd="close"></a>' +
-                ((title != null) ? '<div class="' + o.cssPrefix + '-popup__title">' + title + '</div>' : '') +
-                ((message != null) ? '<p class="' + o.cssPrefix + '-popup__content">' + message + '</p>' : '') +
-                '<div style="text-align: center;">' +
-                '<input class="' + o.cssPrefix + '-popup__button" type="submit" value="' + okText + '">' +
-                '</div>' +
-                '</div>';
+            buttonClass,
+            html;
+        
+        buttonClass = o.cssPrefix + '-popup__button';
+        if (o.buttonModifier) {
+            buttonClass += ' ' + buttonClass + o.buttonModifier;
+        }
+            
+        html = '<div class="' + o.cssPrefix + '-popup">' +
+            '<a class="' + o.cssPrefix + '-popup__close" href="#" title="Закрыть" data-' + o.namespace + '-cmd="close"></a>' +
+            ((title != null) ? '<div class="' + o.cssPrefix + '-popup__title">' + title + '</div>' : '') +
+            ((message != null) ? '<p class="' + o.cssPrefix + '-popup__content">' + message + '</p>' : '') +
+            '<div style="text-align: center;">' +
+            '<input class="' + buttonClass + '" type="submit" value="' + okText + '">' +
+            '</div>' +
+            '</div>';
         return $(html);
     };
     
-    defaults = {
-        namespace: 'popup',
+    Alert.defaults = defaults = {
+        namespace: 'alert',
         modal: true,
         autoOpen: true,
-        cssPrefix: 'b-toru'
+        cssPrefix: 'b-toru',
+        buttonModifier: ''
     };
 
     context.Alert = Alert;
