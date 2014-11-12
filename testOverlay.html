@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Popup test</title>
+    <script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="pubsub.js"></script>
+    <script src="viewport.js"></script>
+    <script src="overlay.js"></script>
+    <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            background: #eee;
+            font: 13px 'PT Sans', Arial, "Helvetica Neue", Helvetica, sans-serif;
+        }
+        .widthTest {
+            width: 2000px;
+            height: 100px;
+        }
+        .widthTest_100p {
+            width: 2000px;
+            height: 1500px;
+        }
+        .red2 {
+            width: 300px;
+            height: 100px;
+            background: red;
+            position: absolute;
+            top: 4000px;
+            left: 1000px;
+            display: none;
+        }
+    </style>
+</head>
+<body class="mob"><!--
+--><div class="widthTest">
+    .
+</div><!--
+--><div class="widthTest_100p">
+    .
+</div><!--
+
+--><div class="red">
+f
+</div><!--
+
+--><script>
+var o = new Overlay();
+o.show();
+o.getNode().on('click', function() { o.hide(null) });
+var z;
+setTimeout(z = function(){
+    var s = '';
+    var p = [
+        'document.body.scrollHeight',
+        'document.documentElement.scrollHeight',
+        'document.body.offsetHeight',
+        'document.documentElement.offsetHeight',
+        'document.body.clientHeight',
+        'document.documentElement.clientHeight',
+        'window.innerHeight',
+        'window.clientHeight',
+        'window.offsetHeight',
+        'window.scrollHeight'
+    ];
+    function prop(path) {
+        path = path.split('.');
+        var result = window;
+        while (path.length) {
+            result = result[path[0]];
+            path.shift();
+        }
+        return result;
+    }
+    while (p.length) {
+        s += p[0] + ' = ' + prop(p[0]) + '<br>';
+        p.shift();
+    }
+    $('.widthTest').append(s).css('font-size', '40px');
+    $('.widthTest').append('viewport.visualHeight', viewport.getVisualHeight());
+}, 500);
+$(document).click(function(){
+    $('.widthTest').empty();
+    z();
+});
+</script>
+</body>
+</html>

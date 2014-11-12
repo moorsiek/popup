@@ -2,6 +2,7 @@
     //END OF PROLOG
 
     var PubSub = context.PubSub,
+        Overlay = context.Overlay,
         $ = context.$,
         fixedSupported = context.supportsPositionFixed,
         globalInstanceId = 1;
@@ -9,7 +10,7 @@
     var defaults,
         $body,
         $window,
-        $overlay,
+        overlay,
         overlayClients = 0;
     
     var KEYCODE_ESC = 27;
@@ -50,7 +51,7 @@
         });
         
         $(window).resize(function(){
-            Popup._sizeOverlay();
+            overlay.updateSize();
             self.center();
         });
         
@@ -84,22 +85,6 @@
                 });
             });
     };
-    Popup.report = function(){
-        var rep = '';
-        rep += 'w.$width=' + $(window).width();
-        rep += "\n";
-        rep += 'w.innerWidth=' + window.innerWidth;
-        rep += "\n";
-        rep += 'd.clientWidth=' + document.documentElement.clientWidth;
-        rep += "\n";
-        rep += 'd.offsetWidth=' + document.documentElement.offsetWidth;
-        rep += "\n";
-        rep += 'd.body.clientWidth=' + document.body.clientWidth;
-        rep += "\n";
-        rep += 'd.$width=' + $(document).width();
-        rep += "\n";
-        alert(rep);
-    };
     Popup.prototype._setSize = function() {
         var width,
             height;
@@ -117,52 +102,6 @@
             height: height + 'px'
         });
     };
-    Popup._createOverlay = function() {
-        $overlay = $('<div/>')
-            .css({
-                top: 0,
-                left: 0,
-                width: '100%',
-                position: 'absolute',
-                zIndex: 99999,
-                background: '#000',
-                opacity: 0.7
-            })
-            .appendTo($body);
-        return $overlay;
-    };
-    Popup.prototype._onWindowResize = function() {
-        if ($overlay) {
-            
-        }
-    };
-    Popup._sizeOverlay = function(force) {
-        if (!force && (!$overlay || !$overlay.is(':visible'))) {
-            return;
-        }
-        
-        $overlay.hide();
-        var height = Math.max($(document).outerHeight(), $body.outerHeight(), $(window).height());
-        $overlay
-            .css({
-                height: height + 'px'
-            })
-            .show();
-    };
-    Popup._showOverlay = function() {
-        $overlay = $overlay || Popup._createOverlay();
-        Popup._sizeOverlay(true);
-        ++overlayClients;
-        $overlay.show();
-    };
-    Popup._hideOverlay = function() {
-        if ($overlay) {
-            overlayClients = Math.max(--overlayClients, 0);  
-            if (overlayClients === 0) {
-                $overlay.hide();
-            }
-        }
-    };
     Popup.prototype.open = function() {
         var self = this;
         
@@ -174,9 +113,11 @@
         this._$widget.show();
         this.center();
         if (this._options.modal) {
-            Popup._showOverlay();
+            if (!overlay) overlay = new Overlay();
             
-            $overlay.on('click.' + this._options.namespace + this._id, function(e){
+            this._showOverlay(); //overlay.show();
+            
+            overlay._$overlay.on('click.' + this._options.namespace + this._id, function(e){
                 e.preventDefault();
                 self.close();
             });
@@ -184,13 +125,19 @@
 
         this._opened = true;
     };
+    Popup.prototype._showOverlay = function() {
+        overlay.show(this._options.namespace + this._id);
+    };
+    Popup.prototype._hideOverlay = function() {
+        overlay.show(this._options.namespace + this._id);
+    };
     Popup.prototype.close = function() {
         if (!this._opened) {
             return;
         }
         
         if (this._options.modal) {
-            Popup._hideOverlay();
+            this._hideOverlay(); //overlay.hide();
         }
         this.pub('close');
         this._$widget.hide();
@@ -219,10 +166,10 @@
             top,
             css;
 
-        var layoutWidth = $(document).width(),
-            layoutHeight = $(document).height(),
-            viewportWidth = window.innerWidth != null ? window.innerWidth : document.documentElement.offsetWidth,
-            viewportHeight = window.innerHeight != null ? window.innerHeight : document.documentElement.offsetHeight,
+        var layoutWidth = viewport.getLayoutWidth(),
+            layoutHeight = viewport.getLayoutHeight(),
+            viewportWidth = viewport.getVisualWidth(),
+            viewportHeight = viewport.getVisualHeight(),
             scrollLeft = $(window).scrollLeft(),
             scrollTop = $(window).scrollTop();
 
