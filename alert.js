@@ -23,13 +23,14 @@
     
     Alert.prototype._createContent = function(title, message, okText) {
         var o = this._options,
-            html = '<div class="' + o.cssPrefix + '-popup">' +
-                '<a class="' + o.cssPrefix + '-popup__close" href="#" title="Закрыть" data-' + o.namespace + '-cmd="close"></a>' +
-                ((title != null) ? '<div class="' + o.cssPrefix + '-popup__title">' + title + '</div>' : '') +
-                ((message != null) ? '<p class="' + o.cssPrefix + '-popup__content">' + message + '</p>' : '') +
-                '<div style="text-align: center;">' +
-                '<input class="' + o.cssPrefix + '-popup__button' + o.buttonModifier + '" type="submit" value="' + okText + '">' +
-                '</div>' +
+            html =
+                '<div class="' + o.cssPrefix + '-popup">' +
+                    '<a class="' + o.cssPrefix + '-popup__close" href="#" title="Закрыть" data-' + o.namespace + '-cmd="close"></a>' +
+                    ((title != null) ? '<div class="' + o.cssPrefix + '-popup__title">' + title + '</div>' : '') +
+                    ((message != null) ? '<p class="' + o.cssPrefix + '-popup__content">' + message + '</p>' : '') +
+                    '<div class="' + o.cssPrefix + '-popup__buttons">' +
+                        '<input class="' + o.cssPrefix + '-popup__button' + o.buttonModifier + '" type="submit" value="' + okText + '" data-' + o.namespace + '-cmd="close">' +
+                    '</div>' +
                 '</div>';
         return $(html);
     };

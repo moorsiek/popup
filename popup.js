@@ -31,6 +31,7 @@
         this._id = globalInstanceId++;
         maxZindex += this._options.modal ? 2 : 1;
         this._zIndex = maxZindex;
+        this._closing = false;
 
         ++instancesInUse;
         
@@ -40,12 +41,13 @@
                 self._setSize();
             })
             .sub('cmd', function(cmd){
-                switch (cmd) {
-                    case 'close':
-                        self.close();
-                        break;
-                    default:
-                        break;
+                if (cmd === 'close') {
+                    self.close();
+                } else if (cmd.indexOf('pub-') === 0) {
+                    var pubTopic = cmd.substr(4);
+                    self.pub(pubTopic);
+                } else {
+                    
                 }
             });
         
@@ -148,9 +150,10 @@
         overlay.hide(this._options.namespace + this._id);
     };
     Popup.prototype.close = function() {
-        if (!this._opened) {
+        if (!this._opened || this._closing) {
             return;
         }
+        this._closing = true;
 
         //TODO: remove dependency on private _$overlay field!
         overlay._$overlay.off('click.' + this._options.namespace + this._id);
@@ -162,6 +165,8 @@
         this._$widget.hide();
         
         this._opened = false;
+
+        this._closing = false;
     };
     Popup.prototype.cleanup = function() {
         this.pub('cleanup');
@@ -250,6 +255,15 @@
     };
     Popup.defaults = defaults = {
         namespace: 'popup'
+    };
+    
+    //TODO: move this function to some utility module/lib
+    Popup.extend = function(Child, Parent) {
+        function dummy(){}
+        dummy.prototype = Parent.prototype;
+        Child.prototype = new dummy;
+        Child.prototype.constructor = Parent;
+        Child.prototype.__superclass__ = Parent;
     };
 
     context.Popup = Popup;

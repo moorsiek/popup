@@ -13,6 +13,8 @@
     <script src="popup.js"></script>
     <!--<script src="alert.js"></script>-->
     <script src="alert2.js"></script>
+    <script src="confirm.js"></script>
+    <!--<script src="popups.min.js"></script>-->
     <style>
         html, body {
             padding: 0;
@@ -71,6 +73,14 @@
 
 
 
+        
+        
+        
+        
+        
+        
+        
+        
 
         .b-bz-popup {
             margin: 0;
@@ -84,8 +94,11 @@
 
             position: relative;
 
-            padding: 0 35px 25px;
+            padding: 0 35px 0;
             border: 1px solid #fff;
+        }
+        .b-bz-popup_buttonless {
+            padding-bottom: 11px;
         }
         .b-bz-popup__title {
             display: block;
@@ -93,9 +106,13 @@
             line-height: 33px;
             font-size: 30px;
             /*padding: 22px 0 27px;*/
-            margin: 22px 0 27px;
+            margin: 32px 0 19px;
             font-weight: 100;
             text-align: center;
+        }
+        .b-bz-popup__content {
+            text-align: center;
+            margin: 19px 0 34px 0;
         }
         .b-bz-popup__close {
             position: absolute;
@@ -118,7 +135,8 @@
             line-height: 35px;
             height: 35px;
             text-align: center;
-            min-width: 210px;
+            /*min-width: 210px;*/
+            min-width: 150px;
             padding: 0 20px;
         }
         .b-bz-popup__button_neutral {
@@ -130,14 +148,33 @@
         .b-bz-popup__button_evil {
             background: #f44545;
         }
-        
-        
-        
+        .b-bz-popup__buttons {
+            text-align: center;
+            margin: 34px 0 30px 0;
+        }
+        .b-bz-popup__buttons_tuple {
+            overflow: hidden;
+        }
+        .b-bz-popup__button_ok {
+            float: right;
+        }
+        .b-bz-popup__button_cancel {
+            float: left;
+        }
+        .b-bz-popup__button_mood_negative {
+            background: #f44545;
+        }
+        .b-bz-popup__button_mood_positive {
+            background: #2EC39F;
+        }
+        .b-bz-popup__button_mood_neutral {
+            background: #888;
+        }
         
 
         body.mob {
-            width: 2000px;
-            height: 5000px;
+            width: 600px;
+            height: 600px;
         }
         body.mob #popups {
             margin-left: 420px;
@@ -176,13 +213,145 @@
 </div>
 
 <ul id="popups">
-    <li><a href="postreg">После регистрации</a></li>
-    <li><a href="sub">После подписки</a></li>
+    <!--<li><a href="postreg">После регистрации</a></li>-->
+<!--    <li><a href="sub">После подписки</a></li>
+    <li>&nbsp;</li>
+    <li><a href="entertext">Вы не ввели текст</a></li>
+    <li><a href="entercode">Вы не ввели код</a></li>
     <li><a href="comment">Удаление комментария</a></li>
+    <li><a href="cannotdelete">Удаление комментария</a></li>
+    <li>&nbsp;</li>
+    <li><a href="fillfields">Заполните поля</a></li>-->
+    <!--<li>&nbsp;</li>
+    <li><a href="z">Удаление комментария</a></li>
     <li><a href="reg">Регистрация</a></li>
-    <li><a href="login">Авторизация</a></li>
+    <li><a href="login">Авторизация</a></li>-->
 </ul>
 <script>
+testSetup = [
+    [
+        'Рассылка, спасибо',
+        'alert',
+        'Спасибо что подписались<br>на нашу рассылку!:)',
+        null,
+        'Хорошо',
+        {
+            //width: '450px',
+            cssPrefix: 'b-bz'
+        }
+    ],
+    [
+        'Не ввели текст',
+        'alert',
+        'Вы не ввели текст сообщения',
+        null,
+        null,
+        {
+            //width: '450px',
+            cssPrefix: 'b-bz',
+            hideButton: true
+        }
+    ],
+    [
+        'Не ввели код',
+        'alert',
+        'Вы не ввели код с картинки',
+        null,
+        null,
+        {
+            //width: '450px',
+            cssPrefix: 'b-bz',
+            hideButton: true
+        }
+    ],
+    [
+        'Не удалось удалить',
+        'alert',
+        'Не удалось удалить комментарий!',
+        null,
+        null,
+        {
+            //width: '450px',
+            cssPrefix: 'b-bz',
+            hideButton: true
+        }
+    ],
+    [
+        'Удалить комментарий?',
+        'confirm',
+        'Удаление&nbsp;комментария',
+        'Вы действительно хотите удалить комментарий?',
+        'Удалить',
+        'Нет', {
+            cssPrefix: 'b-bz',
+            buttonModifier: '_mood_neutral'
+        }
+    ],
+    [
+        'Необходимо заполнить все поля',
+        'alert',
+        'Необходимо заполнить все поля',
+        null,
+        null,
+        {
+            //width: '450px',
+            cssPrefix: 'b-bz',
+            hideButton: true
+        }
+    ]
+];
+    
+var instances = [];
+$(testSetup).each(function(idx, opts){
+    var $link = $('<li></li>'),
+        $a = $('<a href="#"/>');
+    $link.append($a);
+    
+    $a.html(opts[0]);
+    //console.log($a[0]);
+    console.log(opts);
+    $a
+            .on('click', function(e){
+                e.preventDefault();
+                
+                var popup = $(this).data('popup');
+
+                if (popup) {
+                    popup.open();
+                    return;
+                }
+                
+                var title = opts[0];
+                opts.shift();
+                var type = opts[0];
+                opts.shift();
+                
+                if (type === 'alert') {
+                    switch (opts.length) {
+                        case 4: popup = new Alert(opts[0], opts[1], opts[2], opts[3]); break;
+                        case 3: popup = new Alert(opts[0], opts[1], opts[2]); break;
+                        case 2: popup = new Alert(opts[0], opts[1]); break;
+                        case 1: popup = new Alert(opts[0]); break;
+                    }
+                    $(this).data('popup', popup);
+                    popup.show();
+                    
+                } else {
+                    switch (opts.length) {
+                        case 5: popup = new Confirm(opts[0], opts[1], opts[2], opts[3], opts[4]); break;
+                        case 4: popup = new Confirm(opts[0], opts[1], opts[2], opts[3]); break;
+                        case 3: popup = new Confirm(opts[0], opts[1], opts[2]); break;
+                        case 2: popup = new Confirm(opts[0], opts[1]); break;
+                        case 1: popup = new Confirm(opts[0]); break;
+                    }
+                    $(this).data('popup', popup);
+                    popup.show();
+                }
+            });
+    $('#popups').append($link);
+});
+
+/*
     $('#popups')
         .on('click', 'a', function(e){
             e.preventDefault();
@@ -200,24 +369,100 @@
             }
             popup.open();
         });
-    $('a[href=postreg]')
+    $('a[href=sub]')
         .click(function(e){
             e.preventDefault();
             e.stopPropagation();
-            window.a = new Alert(
-                    'Поздравляем<br>с регистрацией на TimeOut',
-                    'Теперь вы можете начать в полной мере пользоваться нашим сайтом, для вас открыты новыми возможности!',
-                    'Начать пользоваться', {
-                        width: '450px',
-                        cssPrefix: 'b-bz',
-                        buttonModifier: '_neutral'
-                    }
-            );
-//            new Alert('Длина пароля должна быть >= 8 символов', {
-//                escapeTitle: true,
-//                escapeContent: true
-//            });
+            if (!window.a) {
+                window.a = new Alert(
+                        //'Поздравляем<br>с регистрацией на TimeOut',
+                        //'Теперь вы можете начать в полной мере пользоваться нашим сайтом,<br> для вас открыты новыми возможности!',
+                        'Спасибо что подписались<br>на нашу рассылку!:)',
+                        null,
+                        'Хорошо', {
+                            //width: '450px',
+                            cssPrefix: 'b-bz',
+                            hideButton: false
+                        }
+                );
+                a.sub('close', function(){
+                    console.log('alert closed!');
+                });
+            }
+            a.open();
         });
+    $('a[href=comment]')
+            .click(function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if (!window.c) {
+                    window.c = new Confirm(
+                            'Удаление&nbsp;комментария',
+                            'Вы действительно хотите удалить комментарий?',
+                            'Удалить',
+                            'Нет', {
+                                //width: '450px',
+                                cssPrefix: 'b-bz',
+                                buttonModifier: '_mood_neutral'
+                            }
+                    );
+                    
+                    c
+                        .sub('ok', function () {
+                            console.log('confirm ok!');
+                        })
+                        .sub('cancel', function () {
+                            console.log('confirm canceled!');
+                        });
+                }
+                c.open();
+            });
+
+    $('a[href=entertext]')
+            .click(function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if (!window.a2) {
+                    window.a2 = new Alert(
+                            'Вы не ввели текст сообщения',
+                            'Вы действительно хотите удалить комментарий?',
+                            'Удалить',
+                            'Нет', {
+                                //width: '450px',
+                                cssPrefix: 'b-bz',
+                                buttonModifier: '_mood_neutral'
+                            }
+                    );
+                }
+                a2.open();
+            });
+
+    $('a[href=comment]')
+            .click(function(e){
+                e.preventDefault();
+                e.stopPropagation();
+                if (!window.c) {
+                    window.c = new Confirm(
+                            'Удаление&nbsp;комментария',
+                            'Вы действительно хотите удалить комментарий?',
+                            'Удалить',
+                            'Нет', {
+                                //width: '450px',
+                                cssPrefix: 'b-bz',
+                                buttonModifier: '_mood_neutral'
+                            }
+                    );
+
+                    c
+                            .sub('ok', function () {
+                                console.log('confirm ok!');
+                            })
+                            .sub('cancel', function () {
+                                console.log('confirm canceled!');
+                            });
+                }
+                c.open();
+            });*/
 </script>
 
 <div style="display: none">

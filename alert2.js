@@ -6,15 +6,7 @@
 
     var defaults;
     
-    function extend(Child, Parent) {
-        function dummy(){}
-        dummy.prototype = Parent.prototype;
-        Child.prototype = new dummy;
-        Child.prototype.constructor = Parent;
-        Child.prototype.__superclass__ = Parent;
-    }
-    
-    extend(Alert, Popup);
+    Popup.extend(Alert, Popup);
     function Alert(title, message, okText, options) {
         this._options = $.extend({}, defaults, options || {});
         okText = okText == null ? 'Ок' : okText;
@@ -37,13 +29,16 @@
             buttonClass += ' ' + buttonClass + o.buttonModifier;
         }
             
-        html = '<div class="' + o.cssPrefix + '-popup">' +
-            '<a class="' + o.cssPrefix + '-popup__close" href="#" title="Закрыть" data-' + o.namespace + '-cmd="close"></a>' +
-            ((title != null) ? '<div class="' + o.cssPrefix + '-popup__title">' + title + '</div>' : '') +
-            ((message != null) ? '<p class="' + o.cssPrefix + '-popup__content">' + message + '</p>' : '') +
-            '<div style="text-align: center;">' +
-            '<input class="' + buttonClass + '" type="submit" value="' + okText + '">' +
-            '</div>' +
+        html =
+            '<div class="' + o.cssPrefix + '-popup ' + (o.hideButton ? o.cssPrefix + '-popup_buttonless' : '') + '" >' +
+                '<a tabindex="2" class="' + o.cssPrefix + '-popup__close" href="#" title="Закрыть" data-' + o.namespace + '-cmd="close"></a>' +
+                ((title != null) ? '<div class="' + o.cssPrefix + '-popup__title">' + title + '</div>' : '') +
+                ((message != null) ? '<p class="' + o.cssPrefix + '-popup__content">' + message + '</p>' : '') +
+                ( o.hideButton ? '' : (
+                '<div class="' + o.cssPrefix + '-popup__buttons">' +
+                    '<input tabindex="1" class="' + buttonClass + '" type="submit" value="' + okText + '" data-' + o.namespace + '-cmd="close">' +
+                '</div>'
+                )) +
             '</div>';
         return $(html);
     };
@@ -53,7 +48,8 @@
         modal: true,
         autoOpen: true,
         cssPrefix: 'b-toru',
-        buttonModifier: ''
+        buttonModifier: '',
+        hideButton: false
     };
 
     context.Alert = Alert;
