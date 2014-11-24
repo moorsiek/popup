@@ -99,19 +99,42 @@
             });
     };
     Popup.prototype._setSize = function() {
-        var width,
-            height;
+        var minWidth = this._options.minWidth,
+            maxWidth = this._options.maxWidth,
+            width = this._options.width,
+            height,
+            css;
+        
+        css = {};
+        
+        if (width != null) {
+            css.width = width + 'px';
+            css.overflow = 'hidden';
+
+            this._$widget.css(css);
+
+            this._width = Math.floor(this._$widget.width());
+            this._height = Math.floor(this._$widget.height());
+        } else {
+            css.width = 'auto';
+            css.overflow = 'visible';
+
+            this._$widget.css(css);
+
+            this._width = Math.floor(this._$widget.width());
+            if (minWidth != null) {
+                this._width = Math.max(minWidth, this._width);
+            }
+            if (maxWidth != null) {
+                this._width = Math.min(maxWidth, this._width);
+            }
+            
+            this._height = Math.floor(this._$widget.height());
+        }
         
         this._$widget.css({
-            width: this._options.width == null ? 'auto' : this._options.width,
-            height: 'auto'
-        });
-        
-        this._width = Math.floor(this._$widget.width());
-        this._height = Math.floor(this._$widget.height());
-        
-        this._$widget.css({
-            width: this._width + 'px'
+            width: this._width + 'px',
+            overflow: 'hidden'
             //TODO: research if we really need setting particular height
             //height: this._height + 'px'
         });
@@ -167,6 +190,10 @@
         this._opened = false;
 
         this._closing = false;
+        
+        if (this._options.autoCleanup) {
+            this.cleanup();
+        }
     };
     Popup.prototype.cleanup = function() {
         this.pub('cleanup');
@@ -254,7 +281,8 @@
         return this._$widget;
     };
     Popup.defaults = defaults = {
-        namespace: 'popup'
+        namespace: 'popup',
+        autoCleanup: false
     };
     
     //TODO: move this function to some utility module/lib

@@ -8,6 +8,15 @@
     
     Popup.extend(Alert, Popup);
     function Alert(title, message, okText, options) {
+        if (options == null) {
+            if (okText != null && typeof okText !== 'string') {
+                options = okText;
+                okText = void(0);
+            } else if (message != null && typeof message !== 'string') {
+                options = message;
+                message = void(0);
+            }
+        }
         this._options = $.extend({}, defaults, options || {});
         okText = okText == null ? 'Ок' : okText;
         this._$content = this._createContent(title, message, okText);
@@ -49,7 +58,8 @@
         autoOpen: true,
         cssPrefix: 'b-toru',
         buttonModifier: '',
-        hideButton: false
+        hideButton: false,
+        autoCleanup: true
     };
 
     context.Alert = Alert;

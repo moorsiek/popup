@@ -86,7 +86,8 @@
         autoOpen: true,
         cssPrefix: 'b-toru',
         okButtonModifier: '_mood_negative',
-        cancelButtonModifier: '_mood_neutral'
+        cancelButtonModifier: '_mood_neutral',
+        autoCleanup: true
     };
 
     context.Confirm = Confirm;

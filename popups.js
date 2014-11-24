@@ -396,19 +396,42 @@ var supportsPositionFixed = (function() {
             });
     };
     Popup.prototype._setSize = function() {
-        var width,
-            height;
+        var minWidth = this._options.minWidth,
+            maxWidth = this._options.maxWidth,
+            width = this._options.width,
+            height,
+            css;
+        
+        css = {};
+        
+        if (width != null) {
+            css.width = width + 'px';
+            css.overflow = 'hidden';
+
+            this._$widget.css(css);
+
+            this._width = Math.floor(this._$widget.width());
+            this._height = Math.floor(this._$widget.height());
+        } else {
+            css.width = 'auto';
+            css.overflow = 'visible';
+
+            this._$widget.css(css);
+
+            this._width = Math.floor(this._$widget.width());
+            if (minWidth != null) {
+                this._width = Math.max(minWidth, this._width);
+            }
+            if (maxWidth != null) {
+                this._width = Math.min(maxWidth, this._width);
+            }
+            
+            this._height = Math.floor(this._$widget.height());
+        }
         
         this._$widget.css({
-            width: this._options.width == null ? 'auto' : this._options.width,
-            height: 'auto'
-        });
-        
-        this._width = Math.floor(this._$widget.width());
-        this._height = Math.floor(this._$widget.height());
-        
-        this._$widget.css({
-            width: this._width + 'px'
+            width: this._width + 'px',
+            overflow: 'hidden'
             //TODO: research if we really need setting particular height
             //height: this._height + 'px'
         });
@@ -464,6 +487,10 @@ var supportsPositionFixed = (function() {
         this._opened = false;
 
         this._closing = false;
+        
+        if (this._options.autoCleanup) {
+            this.cleanup();
+        }
     };
     Popup.prototype.cleanup = function() {
         this.pub('cleanup');
@@ -551,7 +578,17 @@ var supportsPositionFixed = (function() {
         return this._$widget;
     };
     Popup.defaults = defaults = {
-        namespace: 'popup'
+        namespace: 'popup',
+        autoCleanup: false
+    };
+    
+    //TODO: move this function to some utility module/lib
+    Popup.extend = function(Child, Parent) {
+        function dummy(){}
+        dummy.prototype = Parent.prototype;
+        Child.prototype = new dummy;
+        Child.prototype.constructor = Parent;
+        Child.prototype.__superclass__ = Parent;
     };
 
     context.Popup = Popup;
@@ -564,16 +601,17 @@ var supportsPositionFixed = (function() {
 
     var defaults;
     
-    function extend(Child, Parent) {
-        function dummy(){}
-        dummy.prototype = Parent.prototype;
-        Child.prototype = new dummy;
-        Child.prototype.constructor = Parent;
-        Child.prototype.__superclass__ = Parent;
-    }
-    
-    extend(Alert, Popup);
+    Popup.extend(Alert, Popup);
     function Alert(title, message, okText, options) {
+        if (options == null) {
+            if (okText != null && typeof okText !== 'string') {
+                options = okText;
+                okText = void(0);
+            } else if (message != null && typeof message !== 'string') {
+                options = message;
+                message = void(0);
+            }
+        }
         this._options = $.extend({}, defaults, options || {});
         okText = okText == null ? 'Ок' : okText;
         this._$content = this._createContent(title, message, okText);
@@ -596,7 +634,7 @@ var supportsPositionFixed = (function() {
         }
             
         html =
-            '<div class="' + o.cssPrefix + '-popup">' +
+            '<div class="' + o.cssPrefix + '-popup ' + (o.hideButton ? o.cssPrefix + '-popup_buttonless' : '') + '" >' +
                 '<a tabindex="2" class="' + o.cssPrefix + '-popup__close" href="#" title="Закрыть" data-' + o.namespace + '-cmd="close"></a>' +
                 ((title != null) ? '<div class="' + o.cssPrefix + '-popup__title">' + title + '</div>' : '') +
                 ((message != null) ? '<p class="' + o.cssPrefix + '-popup__content">' + message + '</p>' : '') +
@@ -615,7 +653,8 @@ var supportsPositionFixed = (function() {
         autoOpen: true,
         cssPrefix: 'b-toru',
         buttonModifier: '',
-        hideButton: false
+        hideButton: false,
+        autoCleanup: true
     };
 
     context.Alert = Alert;
@@ -627,16 +666,8 @@ var supportsPositionFixed = (function() {
         $ = context.$;
 
     var defaults;
-
-    function extend(Child, Parent) {
-        function dummy(){}
-        dummy.prototype = Parent.prototype;
-        Child.prototype = new dummy;
-        Child.prototype.constructor = Parent;
-        Child.prototype.__superclass__ = Parent;
-    }
-
-    extend(Confirm, Popup);
+    
+    Popup.extend(Confirm, Popup);
     function Confirm(title, message, okText, cancelText, options) {
         if (options == null) {
             if (okText != null && typeof okText !== 'string') {
@@ -716,8 +747,12 @@ var supportsPositionFixed = (function() {
         autoOpen: true,
         cssPrefix: 'b-toru',
         okButtonModifier: '_mood_negative',
-        cancelButtonModifier: '_mood_neutral'
+        cancelButtonModifier: '_mood_neutral',
+        autoCleanup: true
     };
 
     context.Confirm = Confirm;
 }(this);
+
+Alert.defaults.minWidth = 400;
+Alert.defaults.maxWidth = 480;
