@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>github.com/schyzoo/popup Test/all</title>
+    <style>
+        .popup {
+            background: #fff;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .popup__title {
+            font-size: 140%;
+        }
+    </style>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="../popup-all.min.js"></script>
+</head>
+<body>
+<ul id="tests"></ul>
+<script type="text/template" id="exampleDeclarative">
+    <div class="popup">
+        <h1 class="popup__title">Удалить сообщение?</h1>
+        <a href="#" data-popup-cmd="pub-yes, close">Удалить</a>
+        <a href="#" data-popup-cmd="pub-no, close">Отмена</a>
+    </div>
+</script>
+<script>
+var examples = [
+    {
+        title: 'Декларативные события',
+        test: function(){
+            var content = $.parseHTML($('#exampleDeclarative').html()),
+                    popup = new Popup(content, {
+                        modal: true
+                    });
+            popup
+                    .sub('yes', function(){
+                        alert('Удаляем сообщение');
+                    })
+                    .sub('no', function(){
+                        alert('Передумали удалять сообщение');
+                    });
+            popup.open();
+        }
+    }
+];
+$.each(examples, function(idx, example){
+    var $li = $('<li>');
+    $('<a>')
+        .prop('href', '#')
+        .text(example.title)
+        .click(function(){
+                example.test();
+        })
+        .appendTo($li);
+    $li.appendTo('#tests');
+});
+</script>
+</body>
+</html>

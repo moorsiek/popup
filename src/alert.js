@@ -56,7 +56,7 @@
         namespace: 'alert',
         modal: true,
         autoOpen: true,
-        cssPrefix: 'b-toru',
+        cssPrefix: 'b-alert',
         buttonModifier: '',
         hideButton: false,
         autoCleanup: true

@@ -282,6 +282,8 @@
     };
     Popup.defaults = defaults = {
         namespace: 'popup',
+        modal: false,
+        autoOpen: false,
         autoCleanup: false
     };
     
